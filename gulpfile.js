@@ -57,7 +57,9 @@ gulp.task('other', function () {
         'node_modules/superagent/superagent.js',
         'node_modules/vue/dist/vue.min.js',
         'node_modules/markdown-it/dist/markdown-it.min.js',
-        'node_modules/markdown-it-emoji/dist/markdown-it-emoji.min.js'
+        'node_modules/markdown-it-emoji/dist/markdown-it-emoji.min.js',
+        'node_modules/sw-toolbox/sw-toolbox.js',
+        'node_modules/pouchdb/dist/pouchdb.js'
     ]).pipe(gulp.dest('public/3rdparty/js/'));
 });
 
@@ -82,8 +84,12 @@ gulp.task('generate-service-worker', function(callback) {
     var swPrecache = require('sw-precache');
     var rootDir = 'public';
 
-    swPrecache.write(path.join(rootDir, 'sw-precache.js'), {
+    swPrecache.write(path.join(rootDir, 'sw.js'), {
         staticFileGlobs: [rootDir + '/**/*.{js,html,css,png,jpg,gif}'],
+        importScripts: [
+            '3rdparty/js/sw-toolbox.js',
+            'js/sw-api.js'
+        ],
         stripPrefix: rootDir
     }, callback);
 });

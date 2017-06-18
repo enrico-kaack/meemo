@@ -14,6 +14,12 @@
     <!-- Font Awesome -->
     <link href="3rdparty/css/font-awesome.min.css" rel="stylesheet">
 
+      <!--- PouchDb --->
+      <script src="3rdparty/js/pouchdb.js">
+          var db = new PouchDB('test');
+          console.log(db)
+      </script>
+
     <!--- Service Worker registration-->
       <script>
           if ('serviceWorker' in navigator) {
@@ -23,7 +29,9 @@
           }
       </script>
 
-    <link rel="stylesheet" href="index.min.css"/>
+
+
+      <link rel="stylesheet" href="index.min.css"/>
 
   </head>
   <body id="application" @click="$refs.navbar.hideTags()">
