@@ -77,9 +77,20 @@ gulp.task('firefox_extension', function () {
     run('zip -r ../webextension-firefox.xpi .', { cwd: process.cwd() + '/webextension' }).exec();
 });
 
+gulp.task('generate-service-worker', function(callback) {
+    var path = require('path');
+    var swPrecache = require('sw-precache');
+    var rootDir = 'public';
+
+    swPrecache.write(path.join(rootDir, 'sw-precache.js'), {
+        staticFileGlobs: [rootDir + '/**/*.{js,html,css,png,jpg,gif}'],
+        stripPrefix: rootDir
+    }, callback);
+});
+
 gulp.task('extensions', ['chrome_extension', 'firefox_extension'], function () {});
 
-gulp.task('default', ['clean', 'html', 'favicon', 'images', 'styles', 'javascript', '3rdparty'], function () {});
+gulp.task('default', ['clean', 'html', 'favicon', 'images', 'styles', 'javascript', '3rdparty', 'generate-service-worker'], function () {});
 
 gulp.task('clean', function () {
     del.sync(['public/']);

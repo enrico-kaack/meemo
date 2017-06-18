@@ -14,6 +14,15 @@
     <!-- Font Awesome -->
     <link href="3rdparty/css/font-awesome.min.css" rel="stylesheet">
 
+    <!--- Service Worker registration-->
+      <script>
+          if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js').then(function() {
+                  console.log("Service Worker Registered");
+              });
+          }
+      </script>
+
     <link rel="stylesheet" href="index.min.css"/>
 
   </head>
