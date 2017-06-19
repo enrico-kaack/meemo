@@ -6,6 +6,7 @@ exports = module.exports = {
     getAll: getAll,
     getAllPublic: getAllPublic,
     getAllLean: getAllLean,
+    getNew: getNew,
     get: get,
     getPublic: getPublic,
     add: add,
@@ -201,6 +202,26 @@ function facelift(userId, thing, callback) {
 
 function getAll(userId, query, skip, limit, callback) {
     things.getAll(userId, query, skip, limit, function (error, result) {
+        if (error) return callback(error);
+        if (!result) return callback(null, []);
+
+        async.each(result, function (thing, callback) {
+            facelift(userId, thing, function (error, data) {
+                if (error) console.error('Failed to facelift:', error);
+
+                thing.attachments = thing.attachments || [];
+                thing.richContent = data || thing.content;
+
+                callback(null);
+            });
+        }, function () {
+            callback(null, result);
+        });
+    });
+}
+
+function getNew(userId, lastSync, callback) {
+    things.getNew(userId, lastSync, function (error, result) {
         if (error) return callback(error);
         if (!result) return callback(null, []);
 

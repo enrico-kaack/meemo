@@ -8,6 +8,7 @@ exports = module.exports = {
     logout: logout,
     profile: profile,
     getAll: getAll,
+    getNew: getNew,
     get: get,
     add: add,
     put: put,
@@ -170,6 +171,17 @@ function getAll(req, res, next) {
     var limit = isNaN(parseInt(req.query.limit)) ? 10 : parseInt(req.query.limit);
 
     logic.getAll(req.userId, query, skip, limit, function (error, result) {
+        if (error) return next(new HttpError(500, error));
+        next(new HttpSuccess(200, { things: result }));
+    });
+}
+
+function getNew(req, res, next) {
+
+
+    var lastSync = isNaN(parseInt(req.query.lastSync)) ? 0 : parseInt(req.query.lastSync);
+
+    logic.getNew(req.userId, lastSync, function (error, result) {
         if (error) return next(new HttpError(500, error));
         next(new HttpSuccess(200, { things: result }));
     });

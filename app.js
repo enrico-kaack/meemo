@@ -39,6 +39,8 @@ router.get ('/api/things/:id', routes.auth, routes.get);
 router.put ('/api/things/:id', routes.auth, routes.put);
 router.del ('/api/things/:id', routes.auth, routes.del);
 
+router.get ('/api/new', routes.auth, routes.getNew);
+
 router.post('/api/files', routes.auth, memoryUpload, routes.fileAdd);
 router.get ('/api/files/:userId/:identifier', routes.fileGet);
 

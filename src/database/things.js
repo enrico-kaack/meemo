@@ -7,6 +7,7 @@ exports = module.exports = {
 
     getAll: getAll,
     getAllLean: getAllLean,
+    getNew: getNew,
     get: get,
     add: add,
     addFull: addFull,
@@ -53,6 +54,22 @@ function getAll(userId, query, skip, limit, callback) {
     assert.strictEqual(typeof callback, 'function');
 
     getCollection(userId).find(query).skip(skip).limit(limit).sort({ modifiedAt: -1 }).toArray(function (error, result) {
+        if (error) return callback(error);
+        if (!result) return callback(null, []);
+
+        result.forEach(postProcess.bind(null, userId));
+
+        callback(null, result);
+    });
+}
+
+//returns items modified after a given data
+function getNew(userId, lastSync, callback) {
+    assert.strictEqual(typeof userId, 'string');
+    assert.strictEqual(typeof lastSync, 'number');
+    assert.strictEqual(typeof callback, 'function');
+
+    getCollection(userId).find({"modifiedAt": {$gte:lastSync}}).sort({ modifiedAt: -1 }).toArray(function (error, result) {
         if (error) return callback(error);
         if (!result) return callback(null, []);
 
