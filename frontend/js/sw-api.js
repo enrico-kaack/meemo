@@ -4,6 +4,7 @@
 //load data into local database
 
 importScripts('../3rdparty/js/pouchdb.js');
+importScripts('../3rdparty/js/pouchdb.quick-search.js');
 
 self.addEventListener('fetch', function(event) {
     if (event.request.url.match(/\api\/login\/*/g)){
@@ -33,18 +34,19 @@ self.addEventListener('fetch', function(event) {
         var skip = isNaN(parseInt(params.skip)) ? 0 : parseInt(params.skip);
         var limit = isNaN(parseInt(params.limit)) ? 10 : parseInt(params.limit);
         var filter = params.filter;
-        if (filter === null || filter === ''){
+        var archived = params.archived === undefined ? false : params.archived;
+
+        if (filter === undefined || filter === ''){
             event.respondWith(
-                getAll(skip, limit)
+                getAll(skip, limit, archived)
 
 
             );
         }else{
-            //search(filter, skip, limit);
+            event.respondWith(
+                search(filter, skip, limit, archived)
+            );
         }
-
-
-
     }
 
 });
@@ -59,26 +61,36 @@ function decodeUrlForParameter(url){
     return vars;
 }
 
-function search(filterString, skip, limit) {
-    //importScripts('../3rdparty/js/pouchdb.quick-search.js');
-
-    //PouchDB.plugin(quick-search);
+function search(filterString, skip, limit, archived) {
     var db = new PouchDB('things');
-    db.search({
-        query: filterString,
-        fields: ['richContent'],
-        include_docs: true
-    }).then(function (result) {
-        console.log(result)
-    }).catch(function (err) {
-        console.error(err)
-    })
+
+    return promise = new Promise(function(resolve, reject) {
+        db.allDocs({
+            include_docs: true,
+        }).then(function (result) {
+            var searchResult = [];
+            console.log(result)
+            result.rows.forEach(function (thing, item, array) {
+                if (thing.doc.richContent.includes(filterString) && thing.doc.archived === archived) {
+                    searchResult.push(thing.doc);
+                }
+            });
+
+            resolve(new Response(JSON.stringify({things: searchResult}), {
+                headers: {
+                    'Content-Type':'application/json'
+                }
+            }));
+        }).catch(function (err) {
+            reject(Error(err));
+        });
+    });
 }
 
 
-function getAll(skip, limit) {
+function getAll(skip, limit, archived) {
     var db = new PouchDB('things');
-
+    console.log('archived', archived)
     return promise = new Promise(function(resolve, reject) {
         db.allDocs({
             include_docs: true,
@@ -88,7 +100,10 @@ function getAll(skip, limit) {
             var thingList = [];
             console.log(result)
             result.rows.forEach(function (thing, item, array) {
-                thingList.push(thing.doc);
+                if (thing.doc.archived === archived){
+                    thingList.push(thing.doc);
+                }
+
             });
 
             resolve(new Response(JSON.stringify({things: thingList}), {
