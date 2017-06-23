@@ -132,10 +132,8 @@ function decodeUrlForParameter(url){
 }
 
 function search(filterString, skip, limit, archived) {
-    var db = new PouchDB('things');
-
     return promise = new Promise(function(resolve, reject) {
-        db.allDocs({
+        getDatabase().allDocs({
             include_docs: true,
             descending: true
         }).then(function (result) {
@@ -159,9 +157,8 @@ function search(filterString, skip, limit, archived) {
 }
 
 function getAll(skip, limit, archived) {
-    var db = new PouchDB('things');
     return promise = new Promise(function(resolve, reject) {
-        db.allDocs({
+        getDatabase().allDocs({
             include_docs: true,
             skip: skip,
             limit: limit,
@@ -314,7 +311,6 @@ function fetchNewItems(token){
 }
 
 function updateLocalDatabse(data) {
-    var db = new PouchDB('things');
     storeValue('lastSync', new Date().getTime());
 
     data.forEach(function (thing, index, array) {
@@ -328,9 +324,9 @@ function updateSingleThing(db, thing) {
     console.debug('Save to db', thing);
     return promise = new Promise(function (resolve, reject) {
         if (thing._id !== undefined) {
-            db.get(thing._id).then(function (doc) {
+            getDatabase().get(thing._id).then(function (doc) {
                 thing._rev = doc._rev;
-                return db.put(thing);
+                return getDatabase().put(thing);
             }).then(function (response) {
                 console.debug("Success updating thing", response);
                 resolve(new Response(JSON.stringify({thing: thing}), {
@@ -342,7 +338,7 @@ function updateSingleThing(db, thing) {
                 }));
             }).catch(function (err) {
                 if (err.status === 404) {
-                        db.put(thing).then(function (response) {
+                        getDatabase().put(thing).then(function (response) {
                             console.debug('Success inserting thing', response)
                             resolve(new Response(JSON.stringify({thing: thing}), {
                                 headers: {
@@ -359,7 +355,7 @@ function updateSingleThing(db, thing) {
                 }
             });
         } else {
-            db.post(thing).then(function (response) {
+            getDatabase().post(thing).then(function (response) {
                 console.debug('Success inserting thing with auto generated id', response);
                 resolve(new Response(JSON.stringify({thing: thing}), {
                     headers: {
@@ -375,12 +371,7 @@ function updateSingleThing(db, thing) {
     });
 }
 
-function saveNewItem(data){
-    var db = new PouchDB('things');
-    return new Promise(function(resolve, reject) {
 
-    });
-}
 
 
 //store the token in the indexed db, cant use local storage in service worker
