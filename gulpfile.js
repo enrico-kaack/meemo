@@ -60,7 +60,6 @@ gulp.task('other', function () {
         'node_modules/markdown-it-emoji/dist/markdown-it-emoji.min.js',
         'node_modules/sw-toolbox/sw-toolbox.js',
         'node_modules/pouchdb/dist/pouchdb.js',
-        'node_modules/pouchdb-quick-search/dist/pouchdb.quick-search.js'
     ]).pipe(gulp.dest('public/3rdparty/js/'));
 });
 
